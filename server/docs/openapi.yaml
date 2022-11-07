@@ -1,0 +1,117 @@
+openapi: 3.0.3
+
+info:
+  version: v1.0
+  title: DLT-TEST
+
+servers:
+  - url: 'http://localhost:2222'
+
+paths:
+  /api:
+    get:
+      summary: 'Get All Links'
+      security: []
+      tags:
+        - links
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: string
+            example: 'fe4e1f54-bca1-d01a-f38b-c8c032ab7e78'
+        - in: query
+          name: isChanged
+          required: false
+          schema:
+            type: boolean
+            example: true
+      responses:
+        200:
+          description: "Sends list of user's links"
+        400:
+          $ref: '#/components/responses/BadRequestError'
+    post:
+      summary: 'Create New Link'
+      security: []
+      tags:
+        - links
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: string
+            example: 'fe4e1f54-bca1-d01a-f38b-c8c032ab7e78'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                fullUrl:
+                  type: string
+                  required: true
+                  example: 'https://www.google.com'
+                subpart:
+                  type: string
+                  required: false
+                  example: 'S4A2S0S'
+      responses:
+        200:
+          description: 'Creates a new link and returns it'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+  /api/{subpart}:
+    get:
+      summary: 'Redirect'
+      security: []
+      tags:
+        - links
+      parameters:
+        - in: path
+          name: subpart
+          required: true
+          schema:
+            type: string
+            example: 'S4A2S0S'
+      responses:
+        200:
+          description: 'Redirects to the specified URL (by fullUrl)'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+    delete:
+      summary: 'Delete Link'
+      security: []
+      tags:
+        - links
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: string
+            example: 'fe4e1f54-bca1-d01a-f38b-c8c032ab7e78'
+        - in: path
+          name: subpart
+          required: true
+          schema:
+            type: string
+            example: 'S4A2S0S'
+      responses:
+        200:
+          description: 'Deletes the link by its subpart'
+        400:
+          $ref: '#/components/responses/BadRequestError'
+components:
+  responses:
+    BadRequestError:
+      description: 'Bad request error, happens when some request body or query field is missing or invalid'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: missing_required_field:userId

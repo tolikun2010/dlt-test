@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  client:
+    container_name: dlt_test_client
+    build: ./client/
+    restart: unless-stopped
+    environment:
+      - "REACT_APP_BASE_URL=http://localhost:2222/api/"
+      - "PORT=3333"
+    ports:
+      - 3333:3333
+
+  server:
+    container_name: dlt_test_server
+    build: ./server/
+    restart: unless-stopped
+    env_file: ".env"
+    ports:
+      - 2222:2222
+    links:
+      - mongo
+    depends_on:
+      - mongo
+      - redis
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./server/data/mongo:/data/db
+    ports:
+      - '27017:27017'
+
+  redis:
+    image: redis
+    container_name: redis
+    restart: unless-stopped
+    env_file: ".env"
+    volumes:
+      - ./server/data/redis:/data
+    ports:
+      - "6379:6379"
+
